@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using webjetbackendapi.Services.Interfaces;
 
-namespace webjetbackend.Controllers
+namespace webjetbackendapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,7 +18,7 @@ namespace webjetbackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetMovies()
+        public IActionResult Get()
         {
             try
             {
@@ -31,17 +31,18 @@ namespace webjetbackend.Controllers
             }
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public IActionResult GetMoviesById(string id)
         {
             try
             {
+                _movieService.GetMovieDetails(id);
                 return Ok();
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
-        }
+        }*/
     }
 }

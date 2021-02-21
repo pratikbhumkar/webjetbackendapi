@@ -1,15 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using webjetbackendapi.Services;
 using webjetbackendapi.Services.Interfaces;
 
@@ -17,19 +11,22 @@ namespace webjetbackendapi
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        private readonly string _baseUrl;
+        private readonly string _token;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _baseUrl = Configuration.GetSection("BaseUrl").Value;
+            _token = Configuration.GetSection("token").Value;
         }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddScoped<ICinemaWorldService, CinemaWorldService>();
             services.AddScoped<IFilmWorldService, FilmWorldService>();
+            services.AddScoped<IMovieService, MovieService>();
+            services.AddSingleton(Configuration);
             //Enable Cors
             services.AddCors(options =>
             {
@@ -39,9 +36,13 @@ namespace webjetbackendapi
                         builder
                             .AllowAnyOrigin()
                             .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
+                            .AllowAnyHeader();
                     });
+            });
+            services.AddHttpClient<ICinemaWorldService, CinemaWorldService>("CinemaWorldService", client =>
+            {
+                client.DefaultRequestHeaders.Add("x-access-token", _token);
+                client.BaseAddress = new Uri(_baseUrl);
             });
         }
 
