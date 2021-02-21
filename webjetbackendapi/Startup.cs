@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using webjetbackendapi.Services;
+using webjetbackendapi.Services.Interfaces;
 
 namespace webjetbackendapi
 {
@@ -26,6 +28,21 @@ namespace webjetbackendapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<ICinemaWorldService, CinemaWorldService>();
+            services.AddScoped<IFilmWorldService, FilmWorldService>();
+            //Enable Cors
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,13 +52,10 @@ namespace webjetbackendapi
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAll");
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
