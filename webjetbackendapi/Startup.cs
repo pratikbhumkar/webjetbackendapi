@@ -7,6 +7,7 @@ using System;
 using webjetbackendapi.Gateway;
 using webjetbackendapi.Services;
 using webjetbackendapi.Services.Interfaces;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace webjetbackendapi
 {
@@ -48,6 +49,7 @@ namespace webjetbackendapi
                 client.BaseAddress = new Uri(_baseUrl);
                 client.Timeout = TimeSpan.FromSeconds(10);
             });
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +63,13 @@ namespace webjetbackendapi
             app.UseCors("AllowAll");
             app.UseRouting();
             app.UseAuthorization();
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+                c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "WebJetMoviesBackendAPI");
+            });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
