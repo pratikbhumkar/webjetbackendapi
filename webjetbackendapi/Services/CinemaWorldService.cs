@@ -1,48 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using webjetbackendapi.Models;
 using webjetbackendapi.Services.Interfaces;
-using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using webjetbackendapi.Exceptions;
+using webjetbackendapi.Gateway;
 
 namespace webjetbackendapi.Services
 {
     public class CinemaWorldService : ICinemaWorldService
     {
-        private readonly HttpClient _httpClient;
         private readonly ILogger<CinemaWorldService> _logger;
         private readonly IConfiguration _configuration;
-        public CinemaWorldService(HttpClient httpClient, ILogger<CinemaWorldService> logger, IConfiguration configuration)
+        private readonly IMovieServiceGateway _movieServiceGateway;
+        public CinemaWorldService(ILogger<CinemaWorldService> logger, 
+            IConfiguration configuration, IMovieServiceGateway movieServiceGateway)
         {
-            _httpClient = httpClient;
             _logger = logger;
             _configuration = configuration;
+            _movieServiceGateway = movieServiceGateway;
         }
-        public Task<MovieDetails> GetMovieDetails(string id)
+        public async Task<MovieDetails> GetMovieDetails(string id, string source)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Getting movie details");
+            var url = $"{_configuration.GetSection("cinemaworldmoviedetailsextension").Value}/{id}";
+            var content = await _movieServiceGateway.GetDetailsFromServer(url);
+            var movieDetails = JsonConvert.DeserializeObject<MovieDetails>(content);
+            return movieDetails;
         }
 
         public async Task<List<Movie>> GetMovies()
         {
-            try
-            {
-                var response = await _httpClient.GetAsync(_configuration.GetSection("cinemaworldextension").Value);
-                response.EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsStringAsync();
-                MovieResponse movieList;
-                    movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
-                    return movieList.Movies;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to fetch data from CinemaWorld-GetMovies", ex);
-                throw new FetchException("Failed to fetch");
-            }
+            _logger.LogInformation("Getting all movies");
+            var content = await _movieServiceGateway.GetDetailsFromServer(_configuration.GetSection("cinemaworldmoviesextension").Value);
+            var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
+            return movieList.Movies;
         }
     }
 }

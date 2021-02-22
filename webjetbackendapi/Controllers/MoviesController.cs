@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using webjetbackendapi.Services.Interfaces;
@@ -18,12 +19,13 @@ namespace webjetbackendapi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                _movieService.GetMovies();
-                return Ok();
+                _logger.LogInformation("In MoviesController Getting movies");
+                var movieList = await _movieService.GetMovies();
+                return Ok(movieList);
             }
             catch (Exception e)
             {
@@ -31,18 +33,20 @@ namespace webjetbackendapi.Controllers
             }
         }
 
-        /*[HttpGet]
-        public IActionResult GetMoviesById(string id)
+        [HttpGet]
+        [Route("GetMovie/{source}/{id}")]
+        public async Task<IActionResult> GetMoviesById(string source, string id)
         {
             try
             {
-                _movieService.GetMovieDetails(id);
-                return Ok();
+                _logger.LogInformation("In MoviesController Getting movie details");
+                var movieDetails = await _movieService.GetMovieDetails(id, source);
+                return Ok(movieDetails);
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
-        }*/
+        }
     }
 }
