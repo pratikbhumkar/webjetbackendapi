@@ -7,7 +7,6 @@ using System;
 using webjetbackendapi.Gateway;
 using webjetbackendapi.Services;
 using webjetbackendapi.Services.Interfaces;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace webjetbackendapi
 {

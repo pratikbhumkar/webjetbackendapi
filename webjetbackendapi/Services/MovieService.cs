@@ -21,11 +21,11 @@ namespace webjetbackendapi.Services
         public async Task<MovieDetails> GetMovieDetails(string id, string source)
         {
             _logger.LogInformation("Calling GetMovieDetails from MovieService");
-            if (source == MovieSource.Source.CinemaWorld.ToString())
+            if (source == Provider.Cinemaworld.ToString())
             {
-                return await _cinemaWorldService.GetMovieDetails(id, MovieSource.Source.CinemaWorld.ToString());
+                return await _cinemaWorldService.GetMovieDetails(id, Provider.Cinemaworld.ToString());
             }
-            return await _filmWorldService.GetMovieDetails(id, MovieSource.Source.FilmWorld.ToString());
+            return await _filmWorldService.GetMovieDetails(id, Provider.Filmworld.ToString());
         }
 
         public async Task<List<Movie>> GetMovies()

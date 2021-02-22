@@ -19,8 +19,8 @@ namespace webjetbackendapi.Gateway
         public async Task<string> GetDetailsFromServer(string source)
         {
             var result = string.Empty;
-            /*var policy = Policy
-                .Handle<Exception>()
+            var policy = Policy
+                .Handle<FetchException>()
                 .WaitAndRetryAsync(new[]
                 {
                     TimeSpan.FromSeconds(10),
@@ -28,9 +28,9 @@ namespace webjetbackendapi.Gateway
                     TimeSpan.FromSeconds(30)
                 });
             await policy.ExecuteAsync(async () =>
-            {*/
+            {
                 result = await CallServer(source);
-            /*});*/
+            });
             return result;
         }
 

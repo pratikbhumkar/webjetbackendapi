@@ -16,6 +16,6 @@
         public string Metascore { get; set; }
         public double Rating { get; set; }
         public string Votes { get; set; }
-        public new decimal Price { get; set; }
+        public string Price { get; set; }
     }
 }
