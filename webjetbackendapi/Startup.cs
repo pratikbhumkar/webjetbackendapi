@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using Microsoft.Extensions.Caching.Memory;
 using webjetbackendapi.Gateway;
 using webjetbackendapi.Services;
 using webjetbackendapi.Services.Interfaces;
@@ -28,6 +29,7 @@ namespace webjetbackendapi
             services.AddScoped<IFilmWorldService, FilmWorldService>();
             services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<ICinemaWorldService, CinemaWorldService>();
+            services.AddScoped<IMemoryCache, MemoryCache>();
             services.AddSingleton(Configuration);
             //Enable Cors
             services.AddCors(options =>
@@ -41,7 +43,6 @@ namespace webjetbackendapi
                             .AllowAnyHeader();
                     });
             });
-            
             services.AddHttpClient<IMovieServiceGateway, MovieServiceGateway>("CinemaWorldService", client =>
             {
                 client.DefaultRequestHeaders.Add("x-access-token", _token);
@@ -63,7 +64,6 @@ namespace webjetbackendapi
             app.UseRouting();
             app.UseAuthorization();
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";

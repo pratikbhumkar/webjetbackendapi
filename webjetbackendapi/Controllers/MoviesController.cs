@@ -19,6 +19,7 @@ namespace webjetbackendapi.Controllers
         }
 
         [HttpGet]
+        /*[ResponseCache(Duration = 180)]*/
         public async Task<IActionResult> Get()
         {
             try

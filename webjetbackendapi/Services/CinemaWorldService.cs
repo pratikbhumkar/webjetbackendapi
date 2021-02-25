@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using webjetbackendapi.Models;
 using webjetbackendapi.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +15,14 @@ namespace webjetbackendapi.Services
         private readonly ILogger<CinemaWorldService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IMovieServiceGateway _movieServiceGateway;
-        public CinemaWorldService(ILogger<CinemaWorldService> logger, 
+        private readonly IMemoryCache _memoryCache;
+        public CinemaWorldService(ILogger<CinemaWorldService> logger, IMemoryCache memoryCache,
             IConfiguration configuration, IMovieServiceGateway movieServiceGateway)
         {
             _logger = logger;
             _configuration = configuration;
             _movieServiceGateway = movieServiceGateway;
+            _memoryCache = memoryCache;
         }
         public async Task<MovieDetails> GetMovieDetails(string id, string source)
         {
@@ -29,13 +32,18 @@ namespace webjetbackendapi.Services
             var movieDetails = JsonConvert.DeserializeObject<MovieDetails>(content);
             return movieDetails;
         }
-
         public async Task<List<Movie>> GetMovies()
         {
-            _logger.LogInformation("Getting all movies");
-            var content = await _movieServiceGateway.GetDetailsFromServer(_configuration.GetSection("cinemaworldmoviesextension").Value);
-            var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
-            return movieList.Movies;
+            _logger.LogInformation("Getting all CinemaWorld movies");
+            if (!_memoryCache.TryGetValue(CacheKeys.CinemaWorldMovieList, out List<Movie> cacheEntry))
+            {
+                _logger.LogInformation("Getting all movies from server");
+                var content = await _movieServiceGateway.GetDetailsFromServer(_configuration.GetSection("cinemaworldmoviesextension").Value);
+                var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
+                _logger.LogInformation("Getting all movies from CinemaWorld server-storing in cache");
+                cacheEntry = movieList.Movies;
+            }
+            return cacheEntry;
         }
     }
 }

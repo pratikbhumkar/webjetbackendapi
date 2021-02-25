@@ -1,13 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using webjetbackendapi.Services.Interfaces;
 using webjetbackendapi.Models;
 using System.Collections.Generic;
-using System.Net.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using webjetbackendapi.Exceptions;
 using webjetbackendapi.Gateway;
 
 namespace webjetbackendapi.Services
@@ -17,13 +15,14 @@ namespace webjetbackendapi.Services
         private readonly ILogger<FilmWorldService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IMovieServiceGateway _movieServiceGateway;
-
-        public FilmWorldService(ILogger<FilmWorldService> logger,
+        private readonly IMemoryCache _memoryCache;
+        public FilmWorldService(ILogger<FilmWorldService> logger, IMemoryCache memoryCache,
             IConfiguration configuration, IMovieServiceGateway movieServiceGateway)
         {
             _logger = logger;
             _configuration = configuration;
             _movieServiceGateway = movieServiceGateway;
+            _memoryCache = memoryCache;
         }
 
         public async Task<MovieDetails> GetMovieDetails(string id, string source)
@@ -37,10 +36,18 @@ namespace webjetbackendapi.Services
 
         public async Task<List<Movie>> GetMovies()
         {
-            _logger.Log(LogLevel.Information, "Getting all movies");
-            var content = await _movieServiceGateway.GetDetailsFromServer(_configuration.GetSection("filmworldmoviesextension").Value);
-            var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
-            return movieList.Movies;
+            _logger.LogInformation("Getting all FilmWorld movies");
+            if (!_memoryCache.TryGetValue(CacheKeys.FilmWorldMovieList, out List<Movie> cacheEntry))
+            {
+                _logger.LogInformation("Getting all movies");
+                var content =
+                    await _movieServiceGateway.GetDetailsFromServer(_configuration
+                        .GetSection("filmworldmoviesextension").Value);
+                var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
+                _logger.LogInformation("Getting all movies from FilmWorld server-storing in cache");
+                cacheEntry = movieList.Movies;
+            }
+            return cacheEntry;
         }
     }
 }

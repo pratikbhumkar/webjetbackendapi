@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using webjetbackendapi.Models;
@@ -23,18 +24,47 @@ namespace webjetbackendapi.Services
             _logger.LogInformation("Calling GetMovieDetails from MovieService");
             if (source == Provider.Cinemaworld.ToString())
             {
-                return await _cinemaWorldService.GetMovieDetails(id, Provider.Cinemaworld.ToString());
+                MovieDetails cinemaWorldMovieDetails = await _cinemaWorldService.GetMovieDetails(id, Provider.Cinemaworld.ToString());
+                cinemaWorldMovieDetails.Provider = Provider.Cinemaworld;
+                return cinemaWorldMovieDetails;
             }
-            return await _filmWorldService.GetMovieDetails(id, Provider.Filmworld.ToString());
+            MovieDetails filmWorldMovieDetails = await _filmWorldService.GetMovieDetails(id, Provider.Filmworld.ToString());
+            filmWorldMovieDetails.Provider = Provider.Filmworld;
+            return filmWorldMovieDetails;
         }
 
-        public async Task<List<Movie>> GetMovies()
+        public async Task<List<CombinedMovie>> GetMovies()
         {
             _logger.LogInformation("Calling GetMovies from MovieService");
             List<Movie> cinemaWorldMovies = await _cinemaWorldService.GetMovies();
             List<Movie> filmWorldMovies = await _filmWorldService.GetMovies();
-            cinemaWorldMovies.AddRange(filmWorldMovies);
-            return cinemaWorldMovies;
+            List<CombinedMovie> combinedMovieList = new List<CombinedMovie>();
+            var combinedMovies = cinemaWorldMovies.Union(filmWorldMovies, new MovieComparer()).ToList();
+            foreach (var movie in combinedMovies)
+            {
+                combinedMovieList.Add(new CombinedMovie()
+                {
+                    CinemaWorldId = cinemaWorldMovies.Find(movie1 => movie1.Title.Equals(movie.Title))?.Id,
+                    FilmWorldId = filmWorldMovies.Find(movie1 => movie1.Title.Equals(movie.Title))?.Id,
+                    Poster = movie.Poster,
+                    Title = movie.Title,
+                    Type = movie.Type,
+                    Year = movie.Year
+                });
+            }
+            return combinedMovieList;
+        }
+    }
+
+    public class MovieComparer : IEqualityComparer<Movie>
+    {
+        public bool Equals(Movie x, Movie y)
+        {
+            return y != null && x != null && x.Title.Equals(y.Title);
+        }
+        public int GetHashCode(Movie obj)
+        {
+            return obj.Title.GetHashCode();
         }
     }
 }

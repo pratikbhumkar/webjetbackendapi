@@ -6,7 +6,7 @@ namespace webjetbackendapi.Services.Interfaces
 {
     public interface IMovieService
     {
-        Task<List<Movie>> GetMovies();
+        Task<List<CombinedMovie>> GetMovies();
         Task<MovieDetails> GetMovieDetails(string id, string source);
     }
 }
