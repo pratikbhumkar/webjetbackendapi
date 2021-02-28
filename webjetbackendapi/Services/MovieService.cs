@@ -25,11 +25,11 @@ namespace webjetbackendapi.Services
             if (source == Provider.Cinemaworld.ToString())
             {
                 MovieDetails cinemaWorldMovieDetails = await _cinemaWorldService.GetMovieDetails(id, Provider.Cinemaworld.ToString());
-                cinemaWorldMovieDetails.Provider = Provider.Cinemaworld;
+                cinemaWorldMovieDetails.Provider = Provider.Cinemaworld.ToString();
                 return cinemaWorldMovieDetails;
             }
             MovieDetails filmWorldMovieDetails = await _filmWorldService.GetMovieDetails(id, Provider.Filmworld.ToString());
-            filmWorldMovieDetails.Provider = Provider.Filmworld;
+            filmWorldMovieDetails.Provider = Provider.Filmworld.ToString();
             return filmWorldMovieDetails;
         }
 
