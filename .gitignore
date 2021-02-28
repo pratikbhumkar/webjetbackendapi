@@ -3,3 +3,4 @@ obj/
 .vs/
 packages/
 webjetbackend.sln.DotSettings.user
+webjetbackendapi/appsettings.json
