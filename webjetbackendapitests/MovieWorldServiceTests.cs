@@ -1,18 +1,18 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using webjetbackendapi;
-using Microsoft.Extensions.DependencyInjection;
 using webjetbackendapi.Models;
 using webjetbackendapi.Services.Interfaces;
 
 namespace webjetbackendapitests
 {
     [TestFixture]
-    public class CinemaWorldServiceTests
+    public class MovieWorldServiceTests
     {
         private ServiceProvider _serviceProvider;
-        private ICinemaWorldService _sut;
+        private IMovieService _sut;
 
         [SetUp]
         public void Setup()
@@ -25,24 +25,24 @@ namespace webjetbackendapitests
         }
 
         [Test]
-        public void TestCinemaWorldServiceGetMoviesDoesntThrowError()
+        public void TestMovieWorldServiceGetMoviesDoesntThrowError()
         {
-            _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            Assert.DoesNotThrow(()=>_sut.GetMovies());
+            _sut = _serviceProvider.GetService<IMovieService>();
+            Assert.DoesNotThrowAsync(() => _sut.GetMovies());
         }
         [Test]
-        public void TestCinemaWorldServiceGetMovieDetailsDoesntThrowError()
+        public void TestMovieWorldServiceGetMovieDetailsDoesntThrowError()
         {
-            _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            Assert.DoesNotThrow(() => _sut.GetMovieDetails("Cinemaworld", "cw0120915"));
+            _sut = _serviceProvider.GetService<IMovieService>();
+            Assert.DoesNotThrowAsync(() => _sut.GetMovieDetails("cw0120915", "Cinemaworld"));
         }
         [Test]
-        public async Task TestCinemaWorldServiceGetMovieDetailsReturnsMovies()
+        public async Task TestMovieWorldServiceGetMovieDetailsReturnsMovies()
         {
-            _sut = _serviceProvider.GetService<ICinemaWorldService>();
+            _sut = _serviceProvider.GetService<IMovieService>();
             var movies = await _sut.GetMovies();
             Assert.IsTrue(movies.Any());
-            Assert.IsInstanceOf<Movie>(movies[0]);
+            Assert.IsInstanceOf<CombinedMovie>(movies[0]);
         }
     }
 }
