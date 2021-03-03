@@ -1,6 +1,6 @@
 ﻿namespace webjetbackendapi.Models
 {
-    public class MovieDetails
+    public class MovieDetails: Movie
     {
         public string Provider { get; set; }
         public string Rated { get; set; }
@@ -18,10 +18,5 @@
         public double Rating { get; set; }
         public string Votes { get; set; }
         public string Price { get; set; }
-        public string Type { get; set; }
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public int Year { get; set; }
-        public string Poster { get; set; }
     }
 }
