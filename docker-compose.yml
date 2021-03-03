@@ -1,0 +1,13 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  web:
+  #Use "build: ." If "context" i.e. path to the dockerfile is in the same folder/current folder/"."
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    
+  #Volumes created.
+    volumes: 
+      - .:/app

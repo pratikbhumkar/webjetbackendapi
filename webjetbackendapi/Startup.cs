@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using webjetbackendapi.Gateway;
+using webjetbackendapi.Mappers;
 using webjetbackendapi.Services;
 using webjetbackendapi.Services.Interfaces;
 
@@ -20,7 +22,7 @@ namespace webjetbackendapi
         {
             Configuration = configuration;
             _baseUrl = Configuration.GetSection("BaseUrl").Value;
-            _token = Configuration.GetSection("token").Value;
+            _token = Environment.GetEnvironmentVariable("TOKEN");
         }
         
         public void ConfigureServices(IServiceCollection services)
@@ -43,6 +45,14 @@ namespace webjetbackendapi
                             .AllowAnyHeader();
                     });
             });
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MovieCombinedMovieMapper());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
             services.AddHttpClient<IMovieServiceGateway, MovieServiceGateway>("CinemaWorldService", client =>
             {
                 client.DefaultRequestHeaders.Add("x-access-token", _token);
