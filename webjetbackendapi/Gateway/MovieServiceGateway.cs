@@ -44,7 +44,7 @@ namespace webjetbackendapi.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to fetch data from CinemaWorld-GetMovies", ex);
+                _logger.LogError($"Failed to fetch data from {source}-GetMovies", ex);
                 throw new FetchException("Failed to fetch");
             }
         }

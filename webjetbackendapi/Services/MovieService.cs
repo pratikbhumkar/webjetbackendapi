@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using webjetbackendapi.Models;
 using webjetbackendapi.Services.Interfaces;
@@ -9,15 +10,16 @@ namespace webjetbackendapi.Services
 {
     public class MovieService : IMovieService
     {
-        private ICinemaWorldService _cinemaWorldService;
-        private IFilmWorldService _filmWorldService;
+        private readonly ICinemaWorldService _cinemaWorldService;
+        private readonly IFilmWorldService _filmWorldService;
         private readonly ILogger<MovieService> _logger;
-
-        public MovieService(ICinemaWorldService cinemaWorldService, IFilmWorldService filmWorldService, ILogger<MovieService> logger)
+        private readonly IMapper _mapper;
+        public MovieService(ICinemaWorldService cinemaWorldService, IFilmWorldService filmWorldService, ILogger<MovieService> logger, IMapper mapper)
         {
             _cinemaWorldService = cinemaWorldService;
             _filmWorldService = filmWorldService;
             _logger = logger;
+            _mapper = mapper;
         }
         public async Task<MovieDetails> GetMovieDetails(string id, string source)
         {
@@ -39,7 +41,8 @@ namespace webjetbackendapi.Services
             List<Movie> cinemaWorldMovies = await _cinemaWorldService.GetMovies();
             List<Movie> filmWorldMovies = await _filmWorldService.GetMovies();
             List<CombinedMovie> combinedMovieList = new List<CombinedMovie>();
-            var combinedMovies = cinemaWorldMovies.Union(filmWorldMovies, new MovieComparer()).ToList();
+            List<Movie> combinedMovies = cinemaWorldMovies.Union(filmWorldMovies, new MovieComparer()).ToList();
+            
             foreach (var movie in combinedMovies)
             {
                 combinedMovieList.Add(new CombinedMovie()
