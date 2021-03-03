@@ -11,7 +11,7 @@ COPY . ./
 RUN dotnet publish webjetbackendapi.sln -c Release -o out
 
 #Generate runtime image
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS production-env
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
