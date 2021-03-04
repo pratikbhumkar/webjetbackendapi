@@ -25,7 +25,7 @@ namespace webjetbackendapi.Controllers
             try
             {
                 _logger.LogInformation("In MoviesController Getting movies");
-                var movieList = await _movieService.GetMovies();
+                var movieList = await _movieService.GetCombinedMoviesAsync();
                 return Ok(movieList);
             }
             catch (Exception e)
@@ -41,7 +41,7 @@ namespace webjetbackendapi.Controllers
             try
             {
                 _logger.LogInformation("In MoviesController Getting movie details");
-                var movieDetails = await _movieService.GetMovieDetails(id, source);
+                var movieDetails = await _movieService.GetProcessedMovieDetailsAsync(id, source);
                 return Ok(movieDetails);
             }
             catch (Exception e)

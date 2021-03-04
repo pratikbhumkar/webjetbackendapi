@@ -1,12 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using webjetbackendapi.Models;
-
-namespace webjetbackendapi.Services.Interfaces
+﻿namespace webjetbackendapi.Services.Interfaces
 {
-    public interface ICinemaWorldService
+    public interface ICinemaWorldService : IMovieDatabaseService
     {
-        Task<List<Movie>> GetMovies();
-        Task<MovieDetails> GetMovieDetails(string id, string source);
     }
 }

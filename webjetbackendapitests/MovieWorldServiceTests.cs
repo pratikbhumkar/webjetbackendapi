@@ -28,19 +28,19 @@ namespace webjetbackendapitests
         public void TestMovieWorldServiceGetMoviesDoesntThrowError()
         {
             _sut = _serviceProvider.GetService<IMovieService>();
-            Assert.DoesNotThrowAsync(() => _sut.GetMovies());
+            Assert.DoesNotThrowAsync(() => _sut.GetCombinedMoviesAsync());
         }
         [Test]
         public void TestMovieWorldServiceGetMovieDetailsDoesntThrowError()
         {
             _sut = _serviceProvider.GetService<IMovieService>();
-            Assert.DoesNotThrowAsync(() => _sut.GetMovieDetails("cw0120915", "Cinemaworld"));
+            Assert.DoesNotThrowAsync(() => _sut.GetProcessedMovieDetailsAsync("cw0120915", "Cinemaworld"));
         }
         [Test]
         public async Task TestMovieWorldServiceGetMovieDetailsReturnsMovies()
         {
             _sut = _serviceProvider.GetService<IMovieService>();
-            var movies = await _sut.GetMovies();
+            var movies = await _sut.GetCombinedMoviesAsync();
             Assert.IsTrue(movies.Any());
             Assert.IsInstanceOf<CombinedMovie>(movies[0]);
         }
