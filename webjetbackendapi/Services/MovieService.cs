@@ -38,6 +38,9 @@ namespace webjetbackendapi.Services
             _logger.LogInformation("Calling GetCombinedMoviesAsync from MovieService.");
             List<Movie> cinemaWorldMovies = await _cinemaWorldService.GetMoviesAsync();
             List<Movie> filmWorldMovies = await _filmWorldService.GetMoviesAsync();
+            /*Here I am creating a combined object where I am merging the objects based on their Title.
+             *I will be then finding their Ids and adding them to the object.
+             */
             List<CombinedMovie> combinedMovieList = new List<CombinedMovie>();
             List<Movie> combinedMovies = cinemaWorldMovies.Union(filmWorldMovies, new MovieComparer()).ToList();
             _logger.LogInformation("Merging movies to form Combined object.");
