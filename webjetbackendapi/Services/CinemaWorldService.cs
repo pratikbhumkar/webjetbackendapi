@@ -24,7 +24,7 @@ namespace webjetbackendapi.Services
             _movieServiceGateway = movieServiceGateway;
             _memoryCache = memoryCache;
         }
-        public async Task<MovieDetails> GetMovieDetails(string id, string source)
+        public async Task<MovieDetails> GetMovieDetailsAsync(string id, string source)
         {
             _logger.LogInformation("Getting movie details");
             var url = $"{_configuration.GetSection("cinemaworldmoviedetailsextension").Value}/{id}";
@@ -32,7 +32,7 @@ namespace webjetbackendapi.Services
             var movieDetails = JsonConvert.DeserializeObject<MovieDetails>(content);
             return movieDetails;
         }
-        public async Task<List<Movie>> GetMovies()
+        public async Task<List<Movie>> GetMoviesAsync()
         {
             _logger.LogInformation("Getting all CinemaWorld movies");
             if (!_memoryCache.TryGetValue(CacheKeys.CinemaWorldMovieList, out List<Movie> cacheEntry))

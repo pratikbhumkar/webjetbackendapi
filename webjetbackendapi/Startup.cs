@@ -29,8 +29,8 @@ namespace webjetbackendapi
         {
             services.AddControllers();
             services.AddScoped<IFilmWorldService, FilmWorldService>();
-            services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<ICinemaWorldService, CinemaWorldService>();
+            services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<IMemoryCache, MemoryCache>();
             services.AddSingleton(Configuration);
             //Enable Cors
@@ -53,7 +53,7 @@ namespace webjetbackendapi
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddHttpClient<IMovieServiceGateway, MovieServiceGateway>("CinemaWorldService", client =>
+            services.AddHttpClient<IMovieServiceGateway, MovieServiceGateway>("MovieDatabaseService", client =>
             {
                 client.DefaultRequestHeaders.Add("x-access-token", _token);
                 client.BaseAddress = new Uri(_baseUrl);

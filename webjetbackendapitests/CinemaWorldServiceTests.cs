@@ -12,7 +12,7 @@ namespace webjetbackendapitests
     public class CinemaWorldServiceTests
     {
         private ServiceProvider _serviceProvider;
-        private ICinemaWorldService _sut;
+        private IMovieDatabaseService _sut;
 
         [SetUp]
         public void Setup()
@@ -27,20 +27,20 @@ namespace webjetbackendapitests
         [Test]
         public void TestCinemaWorldServiceGetMoviesDoesntThrowError()
         {
-            _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            Assert.DoesNotThrow(()=>_sut.GetMovies());
+            _sut = _serviceProvider.GetService<IMovieDatabaseService>();
+            Assert.DoesNotThrow(()=>_sut.GetMoviesAsync());
         }
         [Test]
         public void TestCinemaWorldServiceGetMovieDetailsDoesntThrowError()
         {
             _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            Assert.DoesNotThrow(() => _sut.GetMovieDetails("Cinemaworld", "cw0120915"));
+            Assert.DoesNotThrow(() => _sut.GetMovieDetailsAsync("Cinemaworld", "cw0120915"));
         }
         [Test]
         public async Task TestCinemaWorldServiceGetMovieDetailsReturnsMovies()
         {
             _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            var movies = await _sut.GetMovies();
+            var movies = await _sut.GetMoviesAsync();
             Assert.IsTrue(movies.Any());
             Assert.IsInstanceOf<Movie>(movies[0]);
         }
