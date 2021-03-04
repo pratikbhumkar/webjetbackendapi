@@ -36,12 +36,20 @@ namespace webjetbackendapi.Services
         public async Task<List<CombinedMovie>> GetCombinedMoviesAsync()
         {
             _logger.LogInformation("Calling GetCombinedMoviesAsync from MovieService.");
-            List<Movie> cinemaWorldMovies = await _cinemaWorldService.GetMoviesAsync();
-            List<Movie> filmWorldMovies = await _filmWorldService.GetMoviesAsync();
-            /*Here I am creating a combined object where I am merging the objects based on their Title.
+            var cinemaWorldTask =_cinemaWorldService.GetMoviesAsync();
+            var filmWorldTask = _filmWorldService.GetMoviesAsync();
+            /*
+             * Here I am running both the tasks at the same time, halving the time taken
+             */
+            List<Movie>[] result = await Task.WhenAll(cinemaWorldTask, filmWorldTask);
+            List<Movie> cinemaWorldMovies = result[0];
+            List<Movie> filmWorldMovies = result[1];
+
+            /*
+             * Here I am creating a combined object where I am merging the objects based on their Title.
              *I will be then finding their Ids and adding them to the object.
              */
-            List<CombinedMovie> combinedMovieList = new List<CombinedMovie>();
+            List <CombinedMovie> combinedMovieList = new List<CombinedMovie>();
             List<Movie> combinedMovies = cinemaWorldMovies.Union(filmWorldMovies, new MovieComparer()).ToList();
             _logger.LogInformation("Merging movies to form Combined object.");
             foreach (var movie in combinedMovies)
