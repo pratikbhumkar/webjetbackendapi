@@ -38,9 +38,9 @@ namespace webjetbackendapi.Services
             if (!_memoryCache.TryGetValue(CacheKeys.CinemaWorldMovieList, out List<Movie> cacheEntry))
             {
                 _logger.LogInformation("Getting all movies from server");
-                var content = await _movieServiceGateway.GetDetailsFromServer(
+                string content = await _movieServiceGateway.GetDetailsFromServer(
                     _configuration.GetSection("cinemaworldmoviesextension").Value);
-                var movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
+                MovieResponse movieList = JsonConvert.DeserializeObject<MovieResponse>(content);
                 _logger.LogInformation("Getting all movies from CinemaWorld - server and storing in cache");
                 cacheEntry = movieList.Movies;
             }

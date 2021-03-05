@@ -13,7 +13,6 @@ namespace webjetbackendapitests
     {
         private ServiceProvider _serviceProvider;
         private ICinemaWorldService _sut;
-
         [SetUp]
         public void Setup()
         {
@@ -34,7 +33,7 @@ namespace webjetbackendapitests
         public void TestCinemaWorldServiceGetMovieDetailsDoesntThrowError()
         {
             _sut = _serviceProvider.GetService<ICinemaWorldService>();
-            Assert.DoesNotThrowAsync(() => _sut.GetMovieDetailsAsync("Cinemaworld", "cw0120915"));
+            Assert.DoesNotThrowAsync(() => _sut.GetMovieDetailsAsync("cw0120915", "Cinemaworld"));
         }
         [Test]
         public async Task TestCinemaWorldServiceGetMovieDetailsReturnsMovies()

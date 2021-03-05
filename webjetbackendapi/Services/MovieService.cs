@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using webjetbackendapi.Exceptions;
+using webjetbackendapi.Extensions;
 using webjetbackendapi.Models;
 using webjetbackendapi.Services.Interfaces;
+using InvalidDataException = System.IO.InvalidDataException;
 
 namespace webjetbackendapi.Services
 {
@@ -22,29 +26,44 @@ namespace webjetbackendapi.Services
         public async Task<MovieDetails> GetProcessedMovieDetailsAsync(string id, string source)
         {
             _logger.LogInformation("Calling GetProcessedMovieDetailsAsync from MovieService");
-            if (source == Provider.Cinemaworld.ToString())
+            switch (source)
             {
-                MovieDetails cinemaWorldMovieDetails = await _cinemaWorldService.GetMovieDetailsAsync(id, Provider.Cinemaworld.ToString());
-                cinemaWorldMovieDetails.Provider = Provider.Cinemaworld.ToString();
-                return cinemaWorldMovieDetails;
+                case "Cinemaworld":
+                    MovieDetails cinemaWorldMovieDetails = await _cinemaWorldService.GetMovieDetailsAsync(id, Provider.Cinemaworld.ToString());
+                    cinemaWorldMovieDetails.Provider = Provider.Cinemaworld.ToString();
+                    return cinemaWorldMovieDetails;
+                case "Filmworld":
+                    MovieDetails filmWorldMovieDetails = await _filmWorldService.GetMovieDetailsAsync(id, Provider.Filmworld.ToString());
+                    filmWorldMovieDetails.Provider = Provider.Filmworld.ToString();
+                    return filmWorldMovieDetails;
+                default:
+                    throw new InvalidSourceException($"Invalid source value-{source}");
             }
-            MovieDetails filmWorldMovieDetails = await _filmWorldService.GetMovieDetailsAsync(id, Provider.Filmworld.ToString());
-            filmWorldMovieDetails.Provider = Provider.Filmworld.ToString();
-            return filmWorldMovieDetails;
         }
 
         public async Task<List<CombinedMovie>> GetCombinedMoviesAsync()
         {
             _logger.LogInformation("Calling GetCombinedMoviesAsync from MovieService.");
-            var cinemaWorldTask =_cinemaWorldService.GetMoviesAsync();
-            var filmWorldTask = _filmWorldService.GetMoviesAsync();
-            /*
-             * Here I am running both the tasks at the same time, halving the time taken
-             */
-            List<Movie>[] result = await Task.WhenAll(cinemaWorldTask, filmWorldTask);
-            List<Movie> cinemaWorldMovies = result[0];
-            List<Movie> filmWorldMovies = result[1];
+            List<Movie> cinemaWorldMovies;
+            List<Movie> filmWorldMovies;
+            try
+            {
+                /*
+                 * Here I am running both the tasks at the same time, halving the time taken
+                 */
 
+                var cinemaWorldTask = _cinemaWorldService.GetMoviesAsync();
+                var filmWorldTask = _filmWorldService.GetMoviesAsync();
+
+                List<Movie>[] result = await Task.WhenAll(cinemaWorldTask, filmWorldTask);
+                cinemaWorldMovies = result[0];
+                filmWorldMovies = result[1];
+            }
+            catch (Exception)
+            {
+                throw new InvalidDataException("Data returned from the server is invalid/Data " +
+                                               "cannot be converted");
+            }
             /*
              * Here I am creating a combined object where I am merging the objects based on their Title.
              *I will be then finding their Ids and adding them to the object.
@@ -65,18 +84,6 @@ namespace webjetbackendapi.Services
                 });
             }
             return combinedMovieList;
-        }
-    }
-
-    public class MovieComparer : IEqualityComparer<Movie>
-    {
-        public bool Equals(Movie x, Movie y)
-        {
-            return y != null && x != null && x.Title.Equals(y.Title);
-        }
-        public int GetHashCode(Movie obj)
-        {
-            return obj.Title.GetHashCode();
         }
     }
 }

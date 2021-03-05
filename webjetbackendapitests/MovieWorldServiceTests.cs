@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -37,12 +38,30 @@ namespace webjetbackendapitests
             Assert.DoesNotThrowAsync(() => _sut.GetProcessedMovieDetailsAsync("cw0120915", "Cinemaworld"));
         }
         [Test]
+        public async Task TestMovieWorldServiceGetMovieDetailsDoesAddSourceDetails()
+        {
+            _sut = _serviceProvider.GetService<IMovieService>();
+            MovieDetails result = await _sut.GetProcessedMovieDetailsAsync("cw0120915", "Cinemaworld");
+            Assert.AreEqual(result.Provider, "Cinemaworld");
+        }
+        [Test]
         public async Task TestMovieWorldServiceGetMovieDetailsReturnsMovies()
         {
             _sut = _serviceProvider.GetService<IMovieService>();
             var movies = await _sut.GetCombinedMoviesAsync();
             Assert.IsTrue(movies.Any());
             Assert.IsInstanceOf<CombinedMovie>(movies[0]);
+        }
+
+        [Test]
+        public async Task TestMovieWorldServiceGetMovieDetailsReturnsCombinedCombinedMoviesWithIds()
+        {
+            _sut = _serviceProvider.GetService<IMovieService>();
+            var movies = await _sut.GetCombinedMoviesAsync();
+            if (String.IsNullOrEmpty(movies[0].CinemaWorldId)  && String.IsNullOrEmpty(movies[0].FilmWorldId))
+            {
+                Assert.Fail("The combined result does not have a CinemaWorldId or FilmWorldId");
+            }
         }
     }
 }
